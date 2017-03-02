@@ -1,10 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Router, Route, IndexRoute, hashHistory } from 'react-router';
+import DBConnectionView from './components/views/DBConnectionView';
 
-class Application extends React.Component {
-  render() {
-    return <h1>Hello world!</h1>
-  }
-}
 
-ReactDOM.render(<Application/>, document.getElementById('view'));
+ReactDOM.render(
+  <Router history={hashHistory}>
+    <Route path='/' component={DBConnectionView}>
+      <IndexRoute component={DBConnectionView}></IndexRoute>
+    </Route>
+  </Router>
+  , document.getElementById('view'));
