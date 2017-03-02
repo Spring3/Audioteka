@@ -1,0 +1,35 @@
+{
+  "name": "audioteka",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "test": "mocha test",
+    "start": "nw"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Spring3/Audioteka.git"
+  },
+  "author": "Daniyil Vasylenko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Spring3/Audioteka/issues"
+  },
+  "homepage": "https://github.com/Spring3/Audioteka#readme",
+  "dependencies": {
+    "nw": "^0.20.3",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-es2017": "^6.22.0",
+    "babel-preset-react": "^6.23.0",
+    "json-loader": "^0.5.4",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.1"
+  }
+}
