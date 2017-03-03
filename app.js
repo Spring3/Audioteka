@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route, IndexRoute, hashHistory } from 'react-router';
-import DBConnectionView from './components/views/DBConnectionView';
+import DBConnectionView from './components/views/DBConnView';
 
 
 ReactDOM.render(
