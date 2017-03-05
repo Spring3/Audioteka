@@ -12,6 +12,7 @@ export default class FormGroup extends React.Component {
   render () {
     return (
       <div className={this.state.groupType}>
+        
         <label className="form-control-label" htmlFor={this.props.id}>{this.props.labelText}</label>
         <input type="text" className={this.state.inputType} id={this.props.id} placeholder={this.props.placeholder}/>
         <div className="form-control-feedback">{this.props.feedback || ''}</div>

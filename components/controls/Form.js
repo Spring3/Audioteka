@@ -7,7 +7,7 @@ export default class Form extends React.Component {
 
   render() {
     return (
-      <form className={this.props.type}>
+      <form className={this.props.className} style={this.props.style}>
         {this.props.children}
       </form>
     )
