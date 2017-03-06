@@ -5,9 +5,13 @@ export default class Input extends React.Component {
     super(props);
   }
 
+  textChange (event) {
+    this.props.onchange(event.target.value);
+  }
+
   render() {
     return (
-      <input type={this.props.type} style={this.props.style} id={this.props.id} className={this.props.className} placeholder={this.props.placeholder} required/>
+      <input type={this.props.type} style={this.props.style} onChange={this.textChange.bind(this)} id={this.props.id} className={this.props.className} placeholder={this.props.placeholder} required/>
     ); 
   }
 }
