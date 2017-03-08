@@ -7,7 +7,7 @@ export default class H2 extends React.Component {
 
   render() {
     return (
-      <h2 className={this.props.className}>{this.props.text}</h2>
+      <h2 className={this.props.className} style={this.props.styles}>{this.props.text}</h2>
     );
   }
 }

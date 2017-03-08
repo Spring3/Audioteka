@@ -24,8 +24,16 @@ function createWindow() {
   });
 
   ipc.on('dbConnect', async (event, dbName) => {
-    const instance = await db.connect(path.resolve(__dirname, './data'), dbName);
-    event.sender.send('dbConnect', { result: instance });
+    const result = await db.connect(path.resolve(__dirname, './data'), dbName);
+    event.sender.send('dbConnect', result);
+  });
+
+  ipc.on('loadImgs', (event) => {
+    event.sender.send('loadImgs', {
+      gd: path.join(__dirname, 'src/img/gd.jpg'),
+      vd: path.join(__dirname, 'src/img/vd.jpg'),
+      ma: path.join(__dirname, 'src/img/ma.jpg')
+    });
   });
 }
 

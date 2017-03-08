@@ -1,0 +1,30 @@
+input {
+  padding: .8rem 1.5rem !important;
+}
+
+.btn-primary {
+  color: #0275d8 !important;
+  border-width: 2px !important;
+  border-color: #0275d8 !important;
+  background: transparent !important;
+}
+
+.btn-primary:hover {
+  color: #2497fa !important;
+  border-color: #2497fa !important;
+}
+
+body {
+  background-color: #F4F8FB;
+}
+
+
+.navbar {
+  background: #0275d8 !important;
+  border-bottom: solid 2px #2497fa;
+  color: white !important;
+}
+
+.rounded-circle {
+  background-size: cover !important;
+}
