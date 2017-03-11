@@ -6,7 +6,7 @@ let instance;
 
 module.exports = {
   connect: async function (dbPath, dbname) {
-    if (instance) return { instance };
+    if (instance) return { success: true, instance };
     if (!dbname) return false;
 
     if (!fs.existsSync(dbPath)) {
@@ -23,12 +23,12 @@ module.exports = {
     try {
       instance = await db.open(dbPath);
       return {
-        result: true,
+        success: true,
         instance
       };
     } catch (e) {
       return {
-        result: false,
+        success: false,
         message: e
       };
     }

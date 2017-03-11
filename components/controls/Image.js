@@ -12,7 +12,7 @@ export default class Image extends React.Component {
       height: `${this.props.height}px`,
       width: `${this.props.width}px`,
       border: 'solid 4px white',
-      webkitBoxShadow: '0px 0px 5px 0px rgba(0,0,0,0.75)',
+      WebkitBoxShadow: '0px 0px 5px 0px rgba(0,0,0,0.75)',
       boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.75)'
     };
     return (

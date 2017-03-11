@@ -3,13 +3,23 @@ input {
 }
 
 .btn-primary {
+  border-width: 1px !important;
+  border-color: #0275d8 !important;
+  background: #0275d8 !important;
+}
+
+.btn-ghost {
   color: #0275d8 !important;
-  border-width: 2px !important;
+  border-width: 1px !important;
   border-color: #0275d8 !important;
   background: transparent !important;
 }
 
-.btn-primary:hover {
+.btn-lg {
+  border-width: 2px;
+}
+
+.btn-ghost:hover {
   color: #2497fa !important;
   border-color: #2497fa !important;
 }
@@ -17,7 +27,6 @@ input {
 body {
   background-color: #F4F8FB;
 }
-
 
 .navbar {
   background: #0275d8 !important;
@@ -27,4 +36,21 @@ body {
 
 .rounded-circle {
   background-size: cover !important;
+}
+
+.panel-fluid {
+  padding: 0 !important;
+}
+
+.tables-list li:first-child {
+  border-top: none !important;
+}
+
+.tables-list li:last-child {
+  border-bottom: 2px solid rgb(233, 241, 244) !important;
+}
+
+.tables-list li:hover {
+  background: rgb(250, 250, 250);
+  cursor: pointer;
 }

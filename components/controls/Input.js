@@ -11,7 +11,7 @@ export default class Input extends React.Component {
 
   render() {
     return (
-      <input type={this.props.type} style={this.props.style} onChange={this.textChange.bind(this)} id={this.props.id} className={this.props.className} placeholder={this.props.placeholder} required/>
+      <input type={this.props.type} style={this.props.style} value={this.props.value || ''} onChange={this.textChange.bind(this)} id={this.props.id} className={this.props.className} placeholder={this.props.placeholder} required/>
     ); 
   }
 }

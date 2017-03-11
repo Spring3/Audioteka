@@ -10,6 +10,7 @@ import H2 from './../controls/H2';
 import Label from './../controls/Label';
 import Input from './../controls/Input';
 import Button from './../controls/Button';
+import Copyrights from './../controls/Copyrights';
 
 class DBConnectionView extends React.Component {
   constructor(props){
@@ -17,14 +18,15 @@ class DBConnectionView extends React.Component {
     this.state = {
       message: 'Please enter the name of the database file',
       messageType: '',
-      databaseName: ''
+      databaseName: window.localStorage.dbname || ''
     };
   }
 
   testConnection () {
     const self = this;
     ipcRenderer.on('dbConnect', (event, answer) => {
-      if (answer.result) {
+      if (answer.success) {
+        window.localStorage.dbname = this.state.databaseName;
         this.props.router.push('/main');
       } else {
         const newState = { message: `Failed to connect to a database: ${answer.message}`, messageType: 'danger' };
@@ -42,7 +44,7 @@ class DBConnectionView extends React.Component {
 
   render() {
     const formStyles = {
-      margin: '20px auto',
+      margin: '40px auto',
       padding: '40px 20px',
       backgroundColor: 'white',
       border: 'solid 2px #E9F1F4',
@@ -70,12 +72,13 @@ class DBConnectionView extends React.Component {
           <Form className="fom-signin col-8 col-sm-7 col-md-6 col-lg-5" style={formStyles}>
             <H2 className="form-signin-heading" text="Connection"/>
             <Label for="inputConn" type={this.state.messageType} style={labelStyle} text={this.state.message} hidden/>
-            <Input type="text" style={inputStyles} id="inputConn" onchange={this.textChanged.bind(this)} className="form-control form-control-success" attributes="autofocus"/>
-            <Button className="btn btn-lg btn-primary btn-block" style={buttonStyles} text="Connect" onclick={this.testConnection.bind(this)} />
+            <Input type="text" style={inputStyles} id="inputConn" value={this.state.databaseName} onchange={this.textChanged.bind(this)} className="form-control form-control-success" attributes="autofocus"/>
+            <Button className="btn btn-lg btn-primary btn-block btn-ghost" style={buttonStyles} text="Connect" onclick={this.testConnection.bind(this)} />
           </Form>
         </Container>
+        <Copyrights/>
       </div>
-    )
+    );
   }
 };
 

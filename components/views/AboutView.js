@@ -8,6 +8,7 @@ import H2 from './../controls/H2';
 import H3 from './../controls/H3';
 import Paragraph from './../controls/Paragraph';
 import Row from './../controls/Row';
+import Copyrights from './../controls/Copyrights';
 
 export default class AboutView extends React.Component{
   constructor(props) {
@@ -76,6 +77,7 @@ export default class AboutView extends React.Component{
             </Image>
           </Row>
         </Container>
+        <Copyrights/>
       </div>
     );
   }
