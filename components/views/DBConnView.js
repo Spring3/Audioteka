@@ -71,9 +71,9 @@ class DBConnectionView extends React.Component {
         <Container className="container">
           <Form className="fom-signin col-8 col-sm-7 col-md-6 col-lg-5" style={formStyles}>
             <H2 className="form-signin-heading" text="Connection"/>
-            <Label for="inputConn" type={this.state.messageType} style={labelStyle} text={this.state.message} hidden/>
-            <Input type="text" style={inputStyles} id="inputConn" value={this.state.databaseName} onchange={this.textChanged.bind(this)} className="form-control form-control-success" attributes="autofocus"/>
-            <Button className="btn btn-lg btn-primary btn-block btn-ghost" style={buttonStyles} text="Connect" onclick={this.testConnection.bind(this)} />
+            <Label for="inputConn" type={this.state.messageType} styles={labelStyle} text={this.state.message} hidden/>
+            <Input type="text" style={inputStyles} id="inputConn" value={this.state.databaseName} onchange={this.textChanged.bind(this)} className="form-control wide" attributes="autofocus"/>
+            <Button className="btn btn-lg btn-primary btn-block btn-ghost" styles={buttonStyles} text="Connect" onclick={this.testConnection.bind(this)} />
           </Form>
         </Container>
         <Copyrights/>

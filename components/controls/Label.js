@@ -6,11 +6,6 @@ export default class Label extends React.Component {
   }
   
   render() {
-    const type = this.props.type;
-    let className = '';
-    if (type) {
-      className = `text-${type}`;
-    }
-    return <label htmlFor={this.props.for} className={className} style={this.props.style}>{this.props.text}</label>;
+    return <label htmlFor={this.props.for} className={this.props.className} style={this.props.styles}>{this.props.text}</label>;
   }
 }

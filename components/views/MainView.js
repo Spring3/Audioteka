@@ -5,8 +5,6 @@ import Container from './../controls/Container';
 import Row from './../controls/Row';
 import Panel from './../controls/Panel';
 import H4 from './../controls/H4';
-import Label from './../controls/Label';
-import Input from './../controls/Input';
 import { List, ListItem } from './../controls/List';
 import Copyrights from './../controls/Copyrights';
 import Button from './../controls/Button';
@@ -77,12 +75,7 @@ export default class MainView extends React.Component {
                   <ListItem text="Seven" styles={listItemStyle}/>
                 </List>
               </Panel>
-              <ModalWindow title="New table" id="createTable" confirm="Create">
-                <div className="form-group">
-                  <Label for="input" text="Input" className="form-control-label"/>
-                  <Input type="text" id="input" className="form-control" attributes="autofocus"/>
-                </div>
-              </ModalWindow>
+              <ModalWindow title="New table" id="createTable" confirm="Create"></ModalWindow>
             </Panel>
             <Panel cols='offset-sm-1 col-sm-8' styles={panelStyle}>
             </Panel>

@@ -1,5 +1,14 @@
-input {
+input .wide {
   padding: .8rem 1.5rem !important;
+}
+
+button {
+  cursor: pointer;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: row;
 }
 
 .btn-primary {
