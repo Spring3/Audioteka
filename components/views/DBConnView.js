@@ -22,17 +22,23 @@ class DBConnectionView extends React.Component {
     };
   }
 
+  componentWillUnmount() {
+    delete ipcRenderer._events['dbConnect'];
+  }
+
   testConnection () {
     const self = this;
-    ipcRenderer.on('dbConnect', (event, answer) => {
-      if (answer.success) {
-        window.localStorage.dbname = this.state.databaseName;
-        this.props.router.push('/main');
-      } else {
-        const newState = { message: `Failed to connect to a database: ${answer.message}`, messageType: 'danger' };
-        self.setState(newState);
-      }
-    });
+    if (!ipcRenderer._events['dbConnect']) {
+      ipcRenderer.on('dbConnect', (event, answer) => {
+        if (answer.success) {
+          window.localStorage.dbname = this.state.databaseName;
+          this.props.router.push('/main');
+        } else {
+          const newState = { message: `Failed to connect to a database: ${answer.message}`, messageType: 'danger' };
+          self.setState(newState);
+        }
+      });
+    }
     ipcRenderer.send('dbConnect', this.state.databaseName);
   }
 

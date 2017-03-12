@@ -20,9 +20,18 @@ class ListItem extends React.Component {
     super(props);
   }
 
+  handleClick(e) {
+    this.props.onClick(e);
+  }
+
+  deleteClick(e) {
+    e.stopPropagation();
+    this.props.deleteTable(this.props.text, this.props.id);
+  }
+
   render() {
     return (
-      <li className='list-group-item' style={this.props.styles}>{this.props.text}</li>
+      <li className='list-group-item' style={this.props.styles} onClick={this.handleClick.bind(this)}>{this.props.text}<span className='btn-delete' onClick={this.deleteClick.bind(this)}>&times;</span></li>
     );
   }
 }

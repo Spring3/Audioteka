@@ -63,3 +63,14 @@ body {
   background: rgb(250, 250, 250);
   cursor: pointer;
 }
+
+.btn-delete {
+  display: none;
+}
+
+.tables-list li:hover span.btn-delete {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+  font-size: 16px;
+}

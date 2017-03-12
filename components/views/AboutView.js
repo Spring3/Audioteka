@@ -19,13 +19,17 @@ export default class AboutView extends React.Component{
       ma: ''
     };
     const self = this;
-    ipcRenderer.on('loadImgs', (event, data) => {
-      self.setState(data);
-    });
+    if (!ipcRenderer._events['loadImgs']) {
+      ipcRenderer.on('loadImgs', (event, data) => {
+        self.setState(data);
+      });
+    }
     ipcRenderer.send('loadImgs');
   }
 
-
+  componentWillUnmount() {
+    delete ipcRenderer._events['loadImgs'];
+  }
 
   render() {
     const textAlign = {

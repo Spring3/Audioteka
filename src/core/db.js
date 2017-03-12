@@ -22,6 +22,7 @@ module.exports = {
     
     try {
       instance = await db.open(dbPath);
+      module.exports.instance = instance;
       return {
         success: true,
         instance

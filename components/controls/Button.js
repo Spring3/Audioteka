@@ -13,6 +13,6 @@ export default class Button extends React.Component {
   }
 
   render() {
-    return <button data-toggle={this.props.toggle} data-target={this.props.target} style={this.props.styles} onClick={this.click.bind(this)} className={this.props.className || "btn btn-primary btn-block"} type={this.props.type}>{this.props.text}</button>;
+    return <button style={this.props.styles} onClick={this.click.bind(this)} className={this.props.className || "btn btn-primary btn-block"} type={this.props.type}>{this.props.text}</button>;
   }
 }
