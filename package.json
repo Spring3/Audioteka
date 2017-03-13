@@ -5,10 +5,17 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha test",
-    "start": "node_modules/.bin/webpack && node_modules/.bin/electron .",
-    "dev": "node_modules/.bin/webpack-dev-server",
-    "build": "node_modules/.bin/electron-rebuild",
-    "pack": "node_modules/.bin/electron-packager ./ Audioteka --out ~/Downloads/Audioteka --overwrite"
+    "start": "./node_modules/.bin/webpack && ./node_modules/.bin/electron .",
+    "dev": "./node_modules/.bin/webpack-dev-server",
+    "build": "./node_modules/.bin/electron-rebuild",
+    "pack-mac-x64": "./node_modules/.bin/electron-packager ./ Audioteka --asar --platform=darwin --arch=x64 --out ./builds --overwrite",
+    "pack-linux-ia32": "./node_modules/.bin/electron-packager ./ Audioteka --asar --platform=linux --arch=ia32 --out ./builds --overwrite",
+    "pack-linux-armv7l": "./node_modules/.bin/electron-packager ./ Audioteka --asar --platform=linux --arch=armv7l --out ./builds --overwrite",
+    "pack-linux-x64": "./node_modules/.bin/electron-packager ./ Audioteka --asar --platform=linux --arch=x64 --out ./builds --overwrite",
+    "pack-win-ia32": "./node_modules/.bin/electron-packager ./ Audioteka --asar --platform=win --arch=ia32 --out ./builds --overwrite",
+    "pack-win-x64": "./node_modules/.bin/electron-packager ./ Audioteka --asar --platform=win --arch=x64 --out ./builds --overwrite",
+    "dmg": "./build.sh mac",
+    "deb": "./build.sh linux"
   },
   "repository": {
     "type": "git",
@@ -23,7 +30,6 @@
   "dependencies": {
     "electron-rebuild": "^1.5.7",
     "express": "^4.15.0",
-    "pg-promise": "^5.6.2",
     "react": "^15.4.2",
     "react-addons-css-transition-group": "^15.4.2",
     "react-addons-transition-group": "^15.4.2",
