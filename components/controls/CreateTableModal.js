@@ -38,6 +38,10 @@ class ModalRow extends React.Component {
     this.props.handler(this.state.id, this.state.name, this.state.type, val.nativeEvent.target.value);
   }
 
+  deleteRow() {
+    this.props.delete(this.props.id);
+  }
+
   render () {
     const formGroupStyle = {
       display: 'inline-block !important'
@@ -46,6 +50,8 @@ class ModalRow extends React.Component {
     const labelStyle = {
       justifyContent: 'flex-start !important'
     };
+
+    const removeBtnStyle = this.props.disabled ? { display: 'none' } : { display: 'block' };
 
     return (
       <div className="form-group modal-form" style={formGroupStyle}>
@@ -72,6 +78,10 @@ class ModalRow extends React.Component {
           <Input type="select" className="form-control" value={this.state.option} disabled={this.props.disabled} onChange={this.onConstraintOptionChange.bind(this)}>
             {this.state.options.map((optionLiteral, index) => <option key={index}>{optionLiteral}</option>)}
           </Input>
+        </div>
+        <div style={removeBtnStyle}>
+          <Label text="del" className="form-control-label" styles={labelStyle}/>
+          <Button color="danger" onClick={this.deleteRow.bind(this)}>&times;</Button>
         </div>
       </div>
     );
@@ -126,6 +136,23 @@ export default class ModalWindow extends React.Component {
 
   addRow() {
     this.setState({ contents: this.state.contents.concat([this.state.contents.length])});
+  }
+
+  deleteRow(id) {
+    let index = -1;
+    for(let i = 0; i < this.state.contents.length; i ++) {
+      if (this.state.contents[i] === id) {
+        index = i;
+      }
+    }
+    const contents = this.state.contents;
+    contents.splice(index, 1);
+    const constraints = this.state.constraints;
+    delete constraints[index];
+    this.setState({
+      contents,
+      constraints
+    });
   }
 
   constraintChanged(id, name, type, option) {
@@ -195,9 +222,9 @@ export default class ModalWindow extends React.Component {
               }
               const constraint = this.state.constraints[index];
               if (constraint) {
-                return <ModalRow key={input} id={input} name={constraint.name} tables={this.props.tables} options={this.props.tables} disabled={this.state.exists} type={constraint.type} option={constraint.option} handler={this.constraintChanged.bind(this)} error={this.state.error}/>
+                return <ModalRow key={input} id={input} name={constraint.name} tables={this.props.tables} delete={this.deleteRow.bind(this)} options={this.props.tables} disabled={this.state.exists} type={constraint.type} option={constraint.option} handler={this.constraintChanged.bind(this)} error={this.state.error}/>
               } else {
-                return <ModalRow key={input} id={input} handler={this.constraintChanged.bind(this)} tables={this.props.tables} disabled={this.state.exists} error={this.state.error}/>
+                return <ModalRow key={input} id={input} handler={this.constraintChanged.bind(this)} delete={this.deleteRow.bind(this)} tables={this.props.tables} disabled={this.state.exists} error={this.state.error}/>
               }
             })}
           </ModalBody>
