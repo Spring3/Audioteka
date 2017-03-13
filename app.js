@@ -39,18 +39,20 @@ function createWindow() {
   ipc.on('createTable', async (event, data) => {
     try {
       const array = [];
+      const fKeys = [];
       for ([key, c] of Object.entries(data.constraints)) {
         if (c.option === 'PRIMARY KEY') {
           c.option += ' AUTOINCREMENT';
           array.push(`${c.name} ${c.type} ${c.option}`);
         } else if (c.type === 'REFERENCES') {
           array.push(`${c.name} INTEGER NOT NULL`);
-          array.push(`FOREIGN KEY (${c.name}) REFERENCES ${c.option}(id)`);  
+          fKeys.push(`FOREIGN KEY (${c.name}) REFERENCES ${c.option}(id)`);  
         } else {
           array.push(`${c.name} ${c.type} ${c.option}`);
         }
       }
-      const tableCols = array.join(',');
+      const tableCols = array.concat(fKeys).join(',');
+      console.log(tableCols);
       const result = await db.instance.run(`CREATE TABLE IF NOT EXISTS ${data.tableName} (${tableCols});`);
       event.sender.send('createTable', { success: true });
     } catch (e) {

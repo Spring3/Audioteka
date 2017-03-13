@@ -25,7 +25,7 @@ class ModalRow extends React.Component {
   }
 
   onConstraintTypeChange(val) {
-    const options = val.nativeEvent.target.value === 'REFERENCES' ? this.props.tables : ['', 'NOT NULL', 'UNIQUE', 'PRIMARY KEY'];
+    const options = val.nativeEvent.target.value === 'REFERENCES' ? [''].concat(this.props.tables) : ['', 'NOT NULL', 'UNIQUE', 'PRIMARY KEY'];
     this.setState({ 
       type: val.nativeEvent.target.value,
       options
@@ -51,7 +51,12 @@ class ModalRow extends React.Component {
       justifyContent: 'flex-start !important'
     };
 
-    const removeBtnStyle = this.props.disabled ? { display: 'none' } : { display: 'block' };
+    const removeBtnStyle = this.props.disabled ? { display: 'none' } : { 
+      display: 'flex', 
+      flexDirection: 'column',
+      flexBasis: 'center',
+      alignItems: 'center' 
+    };
 
     return (
       <div className="form-group modal-form" style={formGroupStyle}>
@@ -165,7 +170,7 @@ export default class ModalWindow extends React.Component {
     savedConstraints[id] = newConstraint;
     this.setState({
       constraints: savedConstraints
-    });
+    }, () => { console.log(this.state.constraints)});
   }
 
   columnNameChanged(val) {

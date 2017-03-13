@@ -27,7 +27,13 @@ export default class MainView extends React.Component {
   componentDidMount() {
     if (!ipcRenderer._events['getTables']) {
       ipcRenderer.on('getTables', (event, data) => {
-        this.setState({ tables: data.tables.map(table => table.name) });
+        const tablesArray = [];
+        for(const table of data.tables){
+          if (table.name !== 'sqlite_sequence') {
+            tablesArray.push(table.name);
+          }
+        }
+        this.setState({ tables: tablesArray });
       });
     }
     ipcRenderer.send('getTables');
