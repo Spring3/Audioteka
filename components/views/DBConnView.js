@@ -1,6 +1,7 @@
 import React from 'react';
 import { ipcRenderer } from 'electron';
 import { withRouter } from 'react-router';
+import { Button } from 'reactstrap';
 import Navbar from './../controls/Navbar';
 import NavbarMenuItem from './../controls/NavbarMenuItem';
 import Container from './../controls/Container';
@@ -9,7 +10,6 @@ import FormGroup from './../controls/FormGroup';
 import H2 from './../controls/H2';
 import Label from './../controls/Label';
 import Input from './../controls/Input';
-import Button from './../controls/Button';
 import Copyrights from './../controls/Copyrights';
 
 class DBConnectionView extends React.Component {
@@ -79,7 +79,7 @@ class DBConnectionView extends React.Component {
             <H2 className="form-signin-heading" text="Connection"/>
             <Label for="inputConn" type={this.state.messageType} styles={labelStyle} text={this.state.message} hidden/>
             <Input type="text" style={inputStyles} id="inputConn" value={this.state.databaseName} onchange={this.textChanged.bind(this)} className="form-control wide" attributes="autofocus"/>
-            <Button className="btn btn-lg btn-primary btn-block btn-ghost" styles={buttonStyles} text="Connect" onclick={this.testConnection.bind(this)} />
+            <Button className="btn btn-lg btn-primary btn-block btn-ghost" style={buttonStyles}onClick={this.testConnection.bind(this)}>Connect</Button>
           </Form>
         </Container>
         <Copyrights/>

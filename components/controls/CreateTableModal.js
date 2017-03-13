@@ -11,7 +11,8 @@ class ModalRow extends React.Component {
       id: this.props.id,
       name: this.props.name || '',
       type: this.props.type || '',
-      option: this.props.option || ''
+      option: this.props.option || '',
+      options: this.props.options || ['', 'NOT NULL', 'UNIQUE', 'PRIMARY KEY']
     };
     setTimeout(() => {
       this.props.handler(this.state.id, this.state.name, this.state.type, this.state.option);
@@ -24,7 +25,11 @@ class ModalRow extends React.Component {
   }
 
   onConstraintTypeChange(val) {
-    this.setState({ type: val.nativeEvent.target.value });
+    const options = val.nativeEvent.target.value === 'REFERENCES' ? this.props.tables : ['', 'NOT NULL', 'UNIQUE', 'PRIMARY KEY'];
+    this.setState({ 
+      type: val.nativeEvent.target.value,
+      options
+     });
     this.props.handler(this.state.id, this.state.name, val.nativeEvent.target.value, this.state.option);
   }
 
@@ -46,11 +51,11 @@ class ModalRow extends React.Component {
       <div className="form-group modal-form" style={formGroupStyle}>
         <div>
           <Label text="Constraint" className="form-control-label" styles={labelStyle}/>
-          <Input className="form-control" value={this.state.name} state={this.props.error ? 'danger' : ''} disabled={this.props.disabled} onChange={this.onConstraintNameChange.bind(this)}/>
+          <Input className="form-control" value={this.state.name} disabled={this.props.disabled} onChange={this.onConstraintNameChange.bind(this)}/>
         </div>
         <div>
           <Label text="Type" className="form-control-label" styles={labelStyle}/>
-          <Input type="select" state={this.props.error ? 'danger' : ''} disabled={this.props.disabled} value={this.state.type} className="form-control" onChange={this.onConstraintTypeChange.bind(this)}>
+          <Input type="select" disabled={this.props.disabled} value={this.state.type} className="form-control" onChange={this.onConstraintTypeChange.bind(this)}>
             <option></option>
             <option>INTEGER</option>
             <option>REAL</option>
@@ -59,15 +64,13 @@ class ModalRow extends React.Component {
             <option>DATETIME</option>
             <option>TEXT</option>
             <option>BLOB</option>
+            <option>REFERENCES</option>
           </Input>
         </div>
         <div>
           <Label text="Option" className="form-control-label" styles={labelStyle}/>
-          <Input type="select" className="form-control" value={this.state.option} disabled={this.props.disabled} state={this.props.error ? 'danger' : ''} onChange={this.onConstraintOptionChange.bind(this)}>
-            <option></option>
-            <option>NOT NULL</option>
-            <option>UNIQUE</option>
-            <option>PRIMARY KEY</option>
+          <Input type="select" className="form-control" value={this.state.option} disabled={this.props.disabled} onChange={this.onConstraintOptionChange.bind(this)}>
+            {this.state.options.map((optionLiteral, index) => <option key={index}>{optionLiteral}</option>)}
           </Input>
         </div>
       </div>
@@ -192,9 +195,9 @@ export default class ModalWindow extends React.Component {
               }
               const constraint = this.state.constraints[index];
               if (constraint) {
-                return <ModalRow key={input} id={input} name={constraint.name} disabled={this.state.exists} type={constraint.type} option={constraint.option} handler={this.constraintChanged.bind(this)} error={this.state.error}/>
+                return <ModalRow key={input} id={input} name={constraint.name} tables={this.props.tables} options={this.props.tables} disabled={this.state.exists} type={constraint.type} option={constraint.option} handler={this.constraintChanged.bind(this)} error={this.state.error}/>
               } else {
-                return <ModalRow key={input} id={input} handler={this.constraintChanged.bind(this)} disabled={this.state.exists} error={this.state.error}/>
+                return <ModalRow key={input} id={input} handler={this.constraintChanged.bind(this)} tables={this.props.tables} disabled={this.state.exists} error={this.state.error}/>
               }
             })}
           </ModalBody>

@@ -8,7 +8,7 @@ import Panel from './../controls/Panel';
 import H4 from './../controls/H4';
 import { List, ListItem } from './../controls/List';
 import Copyrights from './../controls/Copyrights';
-import ModalWindow from './../controls/Modal';
+import ModalWindow from './../controls/CreateTableModal';
 import WarningModal from './../controls/WarningModal';
 
 export default class MainView extends React.Component {
@@ -36,6 +36,7 @@ export default class MainView extends React.Component {
   componentWillUnmount() {
     delete ipcRenderer._events['getTables'];
     delete ipcRenderer._events['getTableColumns'];
+    delete ipcRenderer._events['dropTable'];
   }
 
   tableCreated(name) {
@@ -58,12 +59,21 @@ export default class MainView extends React.Component {
             type: element.type
           }
 
-          if (element.pk === 1) {
-            constraint.option = 'PRIMARY KEY';
-          } else if (element.notnull === 1) {
-            constraint.option = 'NOT NULL';
-          } else if (element.cid === 1) {
-            constraint.option = 'UNIQUE';
+          data.fKeys.forEach((key) => {
+            if (key.from === element.name) {
+              constraint.type = 'REFERENCES';
+              constraint.option = key.table;
+            }
+          });
+
+          if (!constraint.type === 'REFERENCES') {
+            if (element.pk === 1) {
+              constraint.option = 'PRIMARY KEY';
+            } else if (element.notnull === 1) {
+              constraint.option = 'NOT NULL';
+            } else if (element.cid === 1) {
+              constraint.option = 'UNIQUE';
+            }
           }
           constraints[index] = constraint;
         });
@@ -179,7 +189,7 @@ export default class MainView extends React.Component {
                   {this.state.tables.map((table, index) => <ListItem key={index} id={index} text={table} styles={listItemStyle} onClick={this.openTable.bind(this)} deleteTable={this.deleteTable.bind(this)}/>)}
                 </List>
               </Panel>
-              <ModalWindow title="New table" open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.tableName} contents={this.state.contents} constraints={this.state.constraints} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
+              <ModalWindow title="New table" tables={this.state.tables} open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.tableName} contents={this.state.contents} constraints={this.state.constraints} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
               <WarningModal open={this.state.warningOpen} message='Are you sure you want to drop the table?' action={this.confirmDrop.bind(this)}/>
             </Panel>
             <Panel cols='offset-sm-1 col-sm-8' styles={panelStyle}>
