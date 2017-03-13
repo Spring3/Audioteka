@@ -8,7 +8,7 @@
     "start": "node_modules/.bin/webpack && node_modules/.bin/electron .",
     "dev": "node_modules/.bin/webpack-dev-server",
     "build": "node_modules/.bin/electron-rebuild",
-    "pack": "node_modules/.bin/electron-packager ./ Audioteka --out ~/Downloads/Audioteka"
+    "pack": "node_modules/.bin/electron-packager ./ Audioteka --out ~/Downloads/Audioteka --overwrite"
   },
   "repository": {
     "type": "git",

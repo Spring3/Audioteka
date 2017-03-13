@@ -120,6 +120,10 @@ export default class ModalWindow extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    delete ipcRenderer._events['createTable'];
+  }
+
   trigger () {
     if (this.state.open) {
       this.setState({
@@ -173,7 +177,7 @@ export default class ModalWindow extends React.Component {
     }, () => { console.log(this.state.constraints)});
   }
 
-  columnNameChanged(val) {
+  tableNameChanged(val) {
     this.setState({
       tableName: val.nativeEvent.target.value
     });
@@ -185,15 +189,16 @@ export default class ModalWindow extends React.Component {
       constraints: this.state.constraints,
       length: this.state.contents.length
     };
-
-    ipcRenderer.on('createTable', (event, data) => {
-      if (data.success) {
-        this.props.onCreate(this.state.tableName);
-        this.trigger();
-      } else {
-        this.setState({ error: true });
-      }
-    });
+    if (!ipcRenderer._events['createTable']) {
+      ipcRenderer.on('createTable', (event, data) => {
+        if (data.success) {
+          this.props.onCreate(this.state.tableName);
+          this.trigger();
+        } else {
+          this.setState({ error: true });
+        }
+      });
+    }
     ipcRenderer.send('createTable', data);
   }
 
@@ -219,7 +224,7 @@ export default class ModalWindow extends React.Component {
           <ModalBody>
             <div className="form-group" style={formGroupStyle}>
               <Label for="input" text="Table name" className="form-control-label" styles={labelStyle}/>
-              <Input id="input" value={this.state.tableName || ''} disabled={this.state.exists} onChange={this.columnNameChanged.bind(this)}/>
+              <Input id="input" value={this.state.tableName || ''} disabled={this.state.exists} onChange={this.tableNameChanged.bind(this)}/>
             </div>
             {this.state.contents.map((input, index) => {
               if (index === 0) {
