@@ -1,7 +1,8 @@
+const path = require('path');
 module.exports = {
-  entry: './react',
+  entry: './ui/react',
   output: {
-    path: __dirname,
+    path: path.join(__dirname, './src'),
     filename: 'bundle.js'
   },
   target: 'electron',

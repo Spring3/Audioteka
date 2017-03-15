@@ -2,11 +2,12 @@ const db = require('sqlite');
 const path = require('path');
 const fs = require('fs');
 
+let name;
 let instance;
 
 module.exports = {
   connect: async function (dbPath, dbname) {
-    if (instance) return { success: true, instance };
+    if (instance && name === dbname) return { success: true, instance };
     if (!dbname) return false;
 
     if (!fs.existsSync(dbPath)) {

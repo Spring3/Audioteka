@@ -18,7 +18,7 @@ class DBConnectionView extends React.Component {
     this.state = {
       message: 'Please enter the name of the database file',
       messageType: '',
-      databaseName: window.localStorage.dbname || ''
+      databaseName: window.sessionStorage.dbname || ''
     };
   }
 
@@ -31,7 +31,7 @@ class DBConnectionView extends React.Component {
     if (!ipcRenderer._events['dbConnect']) {
       ipcRenderer.on('dbConnect', (event, answer) => {
         if (answer.success) {
-          window.localStorage.dbname = this.state.databaseName;
+          window.sessionStorage.dbname = this.state.databaseName;
           this.props.router.push('/main');
         } else {
           const newState = { message: `Failed to connect to a database: ${answer.message}`, messageType: 'danger' };
