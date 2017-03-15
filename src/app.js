@@ -30,9 +30,9 @@ function createWindow() {
 
   ipc.on('loadImgs', (event) => {
     event.sender.send('loadImgs', {
-      gd: path.join(__dirname, '../static/img/gd.jpg'),
-      vd: path.join(__dirname, '../static/img/vd.jpg'),
-      ma: path.join(__dirname, '../static/img/ma.jpg')
+      gd: path.posix.join(__dirname, '../static/img/gd.jpg'),
+      vd: path.posix.join(__dirname, '../static/img/vd.jpg'),
+      ma: path.posix.join(__dirname, '../static/img/ma.jpg')
     });
   });
 
