@@ -1,2 +1,6 @@
 node_modules/
-bundle.js
+src/bundle.js
+data/
+builds/
+*.log
+*.asar

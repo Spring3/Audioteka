@@ -1,11 +1,24 @@
-<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="./static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./static/css/styles.css">
     <title>Audioteka Application</title>
   </head>
-  <body>
+  <body style="font-family: Helvetica;">
     <div id="view"></div>
-    <script src="bundle.js"></script>
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="./static/js/jquery.min.js"></script>
+    <script src="./static/js/tether.min.js"></script>
+    <script src="./static/js/bootstrap.min.js"></script>
+    <script src="./app.asar/bundle.js"></script>
+    <script>if (window.module) module = window.module;</script>
+
+    <style>
+      @font-face {
+        font-family: Modeka;
+        src: url(./static/fonts/Modeka.otf);
+      }
+    </style>
   </body>
 </html>

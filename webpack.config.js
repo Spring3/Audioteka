@@ -1,11 +1,11 @@
 const path = require('path');
 module.exports = {
-  //context: path.join(__dirname, './'),
-  entry: './app',
+  entry: './ui/react',
   output: {
-    path: __dirname,
+    path: path.join(__dirname, './src'),
     filename: 'bundle.js'
   },
+  target: 'electron',
   resolve: {
     extensions: ['.js', '.jsx', '.json']
   },
