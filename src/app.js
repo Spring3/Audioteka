@@ -3,6 +3,22 @@ const electron = require('electron');
 const url = require('url');
 const ipc = electron.ipcMain;
 const db = require('./core/db');
+let tables = [];
+let sender;
+
+require('electron-context-menu')({
+  prepend: (params, BrowserWindow) => {
+    return [{
+      label: 'Select',
+      visible: tables.includes(params.selectionText),
+      click() {
+        if (sender) {
+          sender.send('selectTable', params.selectionText);
+        }
+      }
+    }];
+  }
+});
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
@@ -25,7 +41,13 @@ function createWindow() {
 
   ipc.on('dbConnect', async (event, dbName) => {
     const result = await db.connect(path.resolve(__dirname, '../data'), dbName);
+    tables = await db.instance.all(`SELECT name FROM sqlite_master WHERE type='table'`);
+    tables = tables.map((t) => t.name);
     event.sender.send('dbConnect', result);
+  });
+
+  ipc.on('selectTable', (event) => {
+    sender = event.sender;
   });
 
   ipc.on('loadImgs', (event) => {
@@ -52,17 +74,16 @@ function createWindow() {
         }
       }
       const tableCols = array.concat(fKeys).join(',');
-      console.log(tableCols);
       const result = await db.instance.run(`CREATE TABLE IF NOT EXISTS ${data.tableName} (${tableCols});`);
+      tables.push(data.tableName);
       event.sender.send('createTable', { success: true });
     } catch (e) {
-      event.sender.send('createTable', { success: false });
+      event.sender.send('createTable', { success: false, error: e });
     }
   });
 
   ipc.on('getTables', async (event, data) => {
-    const result = await db.instance.all(`SELECT name FROM sqlite_master WHERE type='table'`); 
-    event.sender.send('getTables', { tables: result });
+    event.sender.send('getTables', { tables });
   });
 
   ipc.on('getTableColumns', async (event, data) => {

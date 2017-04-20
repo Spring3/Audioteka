@@ -61,7 +61,7 @@ class ModalRow extends React.Component {
     return (
       <div className="form-group modal-form" style={formGroupStyle}>
         <div>
-          <Label text="Constraint" className="form-control-label" styles={labelStyle}/>
+          <Label text="Column name" className="form-control-label" styles={labelStyle}/>
           <Input className="form-control" value={this.state.name} disabled={this.props.disabled} onChange={this.onConstraintNameChange.bind(this)}/>
         </div>
         <div>
@@ -216,10 +216,15 @@ export default class ModalWindow extends React.Component {
       justifyContent: 'flex-start !important'
     };
 
+    const btnStyle = {
+      position: 'absolute',
+      bottom: '0px'
+    };
+
     return (
-      <div>
-        <Button className='btn btn-primary btn-block btn-ghost' onClick={this.trigger}>Add New</Button>
-        <Modal isOpen={this.state.open} toggle={this.trigger} className={this.props.className}>
+      <Button className='btn btn-primary btn-block btn-ghost' onClick={this.trigger} style={btnStyle}>
+      Add New
+      <Modal isOpen={this.state.open} toggle={this.trigger} className={this.props.className}>
           <ModalHeader toggle={this.trigger}>{this.state.exists ? this.state.tableName : this.props.title}</ModalHeader>
           <ModalBody>
             <div className="form-group" style={formGroupStyle}>
@@ -244,7 +249,7 @@ export default class ModalWindow extends React.Component {
             <Button onClick={this.create.bind(this)} outline color="success" disabled={this.state.exists}>{this.props.confirm}</Button>
           </ModalFooter>
         </Modal>
-      </div>
+      </Button>
     );
   }
 }

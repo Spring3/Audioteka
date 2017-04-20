@@ -10,6 +10,7 @@ import { List, ListItem } from './../controls/List';
 import Copyrights from './../controls/Copyrights';
 import ModalWindow from './../controls/CreateTableModal';
 import WarningModal from './../controls/WarningModal';
+import TableContentsPanel from './../controls/TableContentsPanel';
 
 export default class MainView extends React.Component {
   constructor(props) {
@@ -25,18 +26,20 @@ export default class MainView extends React.Component {
   }
 
   componentDidMount() {
+    if (!ipcRenderer._events['selectTable']) {
+      ipcRenderer.on('selectTable', (event, tableName) => {
+        this.setState({ selectedTable: tableName });
+        console.log(this.state.selectedTable);
+      });
+    }
     if (!ipcRenderer._events['getTables']) {
       ipcRenderer.on('getTables', (event, data) => {
-        const tablesArray = [];
-        for(const table of data.tables){
-          if (table.name !== 'sqlite_sequence') {
-            tablesArray.push(table.name);
-          }
-        }
+        const tablesArray = data.tables.filter((t) => t !== 'sqlite_sequence');
         this.setState({ tables: tablesArray });
       });
     }
     ipcRenderer.send('getTables');
+    ipcRenderer.send('selectTable');
   }
 
   componentWillUnmount() {
@@ -192,13 +195,14 @@ export default class MainView extends React.Component {
               <H4 text='Tables' styles={headerStyle}/>
               <Panel styles={innerPanelStyle}>
                 <List className= 'tables-list' style={listStyle}>
-                  {this.state.tables.map((table, index) => <ListItem key={index} id={index} text={table} styles={listItemStyle} onClick={this.openTable.bind(this)} deleteTable={this.deleteTable.bind(this)}/>)}
+                  {this.state.tables.map((table, index) => <ListItem key={index} id={index} selectedTable={this.state.selectedTable} text={table} styles={listItemStyle} onClick={this.openTable.bind(this)} deleteTable={this.deleteTable.bind(this)}/>)}
                 </List>
               </Panel>
               <ModalWindow title="New table" tables={this.state.tables} open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.tableName} contents={this.state.contents} constraints={this.state.constraints} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
               <WarningModal open={this.state.warningOpen} message='Are you sure you want to drop the table?' action={this.confirmDrop.bind(this)}/>
             </Panel>
             <Panel cols='offset-sm-1 col-sm-8' styles={panelStyle}>
+              <TableContentsPanel/>
             </Panel>
           </Row>
         </Container>
