@@ -9,7 +9,23 @@ let sender;
 require('electron-context-menu')({
   prepend: (params, BrowserWindow) => {
     return [{
-      label: 'Select',
+      label: 'Select', // select query
+      visible: tables.includes(params.selectionText),
+      click() {
+        if (sender) {
+          sender.send('selectTable', params.selectionText);
+        }
+      }
+    }, {
+      label: 'Insert', // open up popup for insert query
+      visible: tables.includes(params.selectionText),
+      click() {
+        if (sender) {
+          sender.send('insertInto', params.selectionText);
+        }
+      }
+    }, {
+      label: 'Query', // open up popup to run a custom SQL script
       visible: tables.includes(params.selectionText),
       click() {
         if (sender) {
@@ -24,6 +40,15 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
 let mainWindow;
+
+async function execute(query) {
+  const queryType = query.split(' ')[0].toLowerCase();
+  let result;
+  if (queryType === 'select') {
+    result = await db.instance.all(query);
+  }
+  return result;
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 900, height: 700 });
@@ -90,6 +115,15 @@ function createWindow() {
     const result = await db.instance.all(`PRAGMA table_info(${data.tableName});`);
     const fKeys = await db.instance.all(`PRAGMA foreign_key_list(${data.tableName});`);
     event.sender.send('getTableColumns', { columns: result, tableName: data.tableName, fKeys: fKeys });
+  });
+
+  ipc.on('getTableContents', async (event, req) => {
+    const columns = await db.instance.all(`PRAGMA table_info(${req.tableName});`);
+    const data = await execute(`SELECT * from ${req.tableName};`);
+    event.sender.send('getTableContents', {
+      columns,
+      data
+    });
   });
 
   ipc.on('dropTable', async (event, data) => {

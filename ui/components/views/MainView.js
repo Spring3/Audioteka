@@ -29,13 +29,17 @@ export default class MainView extends React.Component {
     if (!ipcRenderer._events['selectTable']) {
       ipcRenderer.on('selectTable', (event, tableName) => {
         this.setState({ selectedTable: tableName });
-        console.log(this.state.selectedTable);
       });
     }
     if (!ipcRenderer._events['getTables']) {
       ipcRenderer.on('getTables', (event, data) => {
         const tablesArray = data.tables.filter((t) => t !== 'sqlite_sequence');
         this.setState({ tables: tablesArray });
+      });
+    }
+    if (!ipcRenderer._events['insertInto']) {
+      ipcRenderer.on('insertInto', (event, tableName) => {
+        this.setState({ selectedTable: tableName });
       });
     }
     ipcRenderer.send('getTables');
@@ -46,6 +50,8 @@ export default class MainView extends React.Component {
     delete ipcRenderer._events['getTables'];
     delete ipcRenderer._events['getTableColumns'];
     delete ipcRenderer._events['dropTable'];
+    delete ipcRenderer._events['selectTable'];
+    delete ipcRenderer._events['insertInto'];
   }
 
   tableCreated(name) {
@@ -202,7 +208,7 @@ export default class MainView extends React.Component {
               <WarningModal open={this.state.warningOpen} message='Are you sure you want to drop the table?' action={this.confirmDrop.bind(this)}/>
             </Panel>
             <Panel cols='offset-sm-1 col-sm-8' styles={panelStyle}>
-              <TableContentsPanel/>
+              <TableContentsPanel tableName={ this.state.selectedTable }/>
             </Panel>
           </Row>
         </Container>
