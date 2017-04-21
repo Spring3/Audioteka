@@ -41,6 +41,7 @@ const BrowserWindow = electron.BrowserWindow;
 
 let mainWindow;
 
+// Execute sql query
 async function execute(query) {
   const queryType = query.split(' ')[0].toLowerCase();
   let result;
@@ -64,6 +65,7 @@ function createWindow() {
     mainWindow = null;
   });
 
+  // test database connection
   ipc.on('dbConnect', async (event, dbName) => {
     const result = await db.connect(path.resolve(__dirname, '../data'), dbName);
     tables = await db.instance.all(`SELECT name FROM sqlite_master WHERE type='table'`);
@@ -71,10 +73,12 @@ function createWindow() {
     event.sender.send('dbConnect', result);
   });
 
+  // When user clicks select on the context menu, a table is marked as selected
   ipc.on('selectTable', (event) => {
     sender = event.sender;
   });
 
+  // load imgs for about page
   ipc.on('loadImgs', (event) => {
     event.sender.send('loadImgs', {
       gd: path.posix.join(__dirname, '../static/img/gd.jpg'),
@@ -83,6 +87,7 @@ function createWindow() {
     });
   });
 
+  // create new table
   ipc.on('createTable', async (event, data) => {
     try {
       const array = [];
@@ -107,16 +112,19 @@ function createWindow() {
     }
   });
 
+  // get existing tables
   ipc.on('getTables', async (event, data) => {
     event.sender.send('getTables', { tables });
   });
 
+  // get columns of a table and info about it
   ipc.on('getTableColumns', async (event, data) => {
     const result = await db.instance.all(`PRAGMA table_info(${data.tableName});`);
     const fKeys = await db.instance.all(`PRAGMA foreign_key_list(${data.tableName});`);
     event.sender.send('getTableColumns', { columns: result, tableName: data.tableName, fKeys: fKeys });
   });
 
+  // select all from table
   ipc.on('getTableContents', async (event, req) => {
     const columns = await db.instance.all(`PRAGMA table_info(${req.tableName});`);
     const data = await execute(`SELECT * from ${req.tableName};`);
@@ -126,6 +134,7 @@ function createWindow() {
     });
   });
 
+  // drop table
   ipc.on('dropTable', async (event, data) => {
     try { 
       const result = await db.instance.run(`DROP TABLE IF EXISTS ${data.tableName};`);

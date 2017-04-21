@@ -56,7 +56,7 @@ export default class TableContentsPanel extends React.Component {
         rowGetter={this.rowGetter}
         rowsCount={this.state.rows.length}
         onGridRowsUpdated={this.gridUpdate}
-        minHeight={290}
+        minHeight={490}
       />);
   }
 }

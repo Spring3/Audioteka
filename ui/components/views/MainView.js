@@ -17,9 +17,7 @@ export default class MainView extends React.Component {
     super(props);
     this.state = {
       tables: [],
-      tableName: undefined,
-      contents: undefined,
-      constraints: undefined,
+      selectedTable: undefined,
       modalOpen: false,
       warningOpen: false
     };
@@ -63,44 +61,10 @@ export default class MainView extends React.Component {
   openTable(event) {
     let tableName = event.nativeEvent.target.innerText;
     tableName = tableName.substring(0, tableName.length - 1);
-    if (!ipcRenderer._events['getTableColumns']) {
-      ipcRenderer.on('getTableColumns', (event, data) => {
-        const constraints = {};
-        const contents = [];
-        data.columns.forEach((element, index) => {
-          contents.push(index);
-          const constraint = {
-            name: element.name,
-            type: element.type
-          }
-
-          data.fKeys.forEach((key) => {
-            if (key.from === element.name) {
-              constraint.type = 'REFERENCES';
-              constraint.option = key.table;
-            }
-          });
-
-          if (!constraint.type === 'REFERENCES') {
-            if (element.pk === 1) {
-              constraint.option = 'PRIMARY KEY';
-            } else if (element.notnull === 1) {
-              constraint.option = 'NOT NULL';
-            } else if (element.cid === 1) {
-              constraint.option = 'UNIQUE';
-            }
-          }
-          constraints[index] = constraint;
-        });
-        this.setState({
-          tableName: data.tableName,
-          contents: contents,
-          constraints: constraints,
-          modalOpen: true
-        });
-      });
-    }
-    ipcRenderer.send('getTableColumns', { tableName });
+    this.setState({
+      selectedTable: tableName,
+      modalOpen: true
+    });
   }
 
   deleteTable (tableName, index = -1) {
@@ -143,9 +107,6 @@ export default class MainView extends React.Component {
 
   reset () {
     this.setState({
-      tableName: undefined,
-      contents: undefined,
-      constraints: undefined,
       modalOpen: false
     });
   }
@@ -204,11 +165,11 @@ export default class MainView extends React.Component {
                   {this.state.tables.map((table, index) => <ListItem key={index} id={index} selectedTable={this.state.selectedTable} text={table} styles={listItemStyle} onClick={this.openTable.bind(this)} deleteTable={this.deleteTable.bind(this)}/>)}
                 </List>
               </Panel>
-              <ModalWindow title="New table" tables={this.state.tables} open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.tableName} contents={this.state.contents} constraints={this.state.constraints} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
+              <ModalWindow title="New table" tables={this.state.tables} open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.selectedTable} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
               <WarningModal open={this.state.warningOpen} message='Are you sure you want to drop the table?' action={this.confirmDrop.bind(this)}/>
             </Panel>
             <Panel cols='offset-sm-1 col-sm-8' styles={panelStyle}>
-              <TableContentsPanel tableName={ this.state.selectedTable }/>
+              <TableContentsPanel tableName={this.state.selectedTable }/>
             </Panel>
           </Row>
         </Container>

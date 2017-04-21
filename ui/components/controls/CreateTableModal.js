@@ -99,8 +99,8 @@ export default class ModalWindow extends React.Component {
     this.state = {
       open: this.props.open || false,
       tableName: this.props.tableName || false,
-      contents: this.props.contents || [],
-      constraints: this.props.constraints || {},
+      contents: [],
+      constraints: {},
       exists: this.props.exists || false
     };
 
@@ -108,20 +108,58 @@ export default class ModalWindow extends React.Component {
     this.addRow = this.addRow.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.open && !this.state.open) {
-      this.setState({
-        open: nextProps.open,
-        tableName: nextProps.tableName,
-        contents: nextProps.contents,
-        constraints: nextProps.constraints,
-        exists: true
+  componentDidMount() {
+    if (!ipcRenderer._events['getTableColumns']) {
+      ipcRenderer.on('getTableColumns', (event, data) => {
+        const constraints = {};
+        const contents = [];
+        data.columns.forEach((element, index) => {
+          contents.push(index);
+          const constraint = {
+            name: element.name,
+            type: element.type
+          }
+
+          data.fKeys.forEach((key) => {
+            if (key.from === element.name) {
+              constraint.type = 'REFERENCES';
+              constraint.option = key.table;
+            }
+          });
+
+          if (!constraint.type === 'REFERENCES') {
+            if (element.pk === 1) {
+              constraint.option = 'PRIMARY KEY';
+            } else if (element.notnull === 1) {
+              constraint.option = 'NOT NULL';
+            } else if (element.cid === 1) {
+              constraint.option = 'UNIQUE';
+            }
+          }
+          constraints[index] = constraint;
+        });
+        this.setState({
+          tableName: data.tableName,
+          contents,
+          constraints,
+          open: true,
+          exists: true
+        });
       });
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.tableName) {
+      if (nextProps.open) {
+        ipcRenderer.send('getTableColumns', { tableName: nextProps.tableName });
+      }
     }
   }
 
   componentWillUnmount() {
     delete ipcRenderer._events['createTable'];
+    delete ipcRenderer._events['getTableColumns'];
   }
 
   trigger () {
