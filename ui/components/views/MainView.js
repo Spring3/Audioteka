@@ -11,6 +11,7 @@ import Copyrights from './../controls/Copyrights';
 import ModalWindow from './../controls/CreateTableModal';
 import WarningModal from './../controls/WarningModal';
 import TableContentsPanel from './../controls/TableContentsPanel';
+import QueryModal from './../controls/QueryModal';
 
 export default class MainView extends React.Component {
   constructor(props) {
@@ -169,9 +170,10 @@ export default class MainView extends React.Component {
               <WarningModal open={this.state.warningOpen} message='Are you sure you want to drop the table?' action={this.confirmDrop.bind(this)}/>
             </Panel>
             <Panel cols='offset-sm-1 col-sm-8' styles={panelStyle}>
-              <TableContentsPanel tableName={this.state.selectedTable }/>
+              <TableContentsPanel main={true} tableName={this.state.selectedTable }/>
             </Panel>
           </Row>
+          <QueryModal/>
         </Container>
         <Copyrights/>
       </div>

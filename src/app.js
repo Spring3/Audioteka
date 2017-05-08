@@ -17,19 +17,11 @@ require('electron-context-menu')({
         }
       }
     }, {
-      label: 'Insert', // open up popup for insert query
+      label: 'New Query', // open up popup to run a custom SQL script
       visible: tables.includes(params.selectionText),
       click() {
         if (sender) {
-          sender.send('insertInto', params.selectionText);
-        }
-      }
-    }, {
-      label: 'Query', // open up popup to run a custom SQL script
-      visible: tables.includes(params.selectionText),
-      click() {
-        if (sender) {
-          sender.send('selectTable', params.selectionText);
+          sender.send('customQuery', params.selectionText);
         }
       }
     }];
@@ -132,6 +124,18 @@ function createWindow() {
       columns,
       data
     });
+  });
+
+  ipc.on('queryExecution', async (event, sqlQuery) => {
+    let result;
+    try {
+      result = await execute(sqlQuery);
+    } catch(e) {
+      result = e;
+    } finally {
+      console.log(result);
+      event.sender.send('queryExecution', result);
+    }
   });
 
   // drop table

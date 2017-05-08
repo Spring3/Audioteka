@@ -94,3 +94,7 @@ li.list-group-item.selected {
   left: -15px;
   position: relative;
 }
+
+.modal-large {
+  max-width: 80% !important;
+}
