@@ -24,6 +24,14 @@ require('electron-context-menu')({
           sender.send('customQuery', params.selectionText);
         }
       }
+    }, {
+      label: 'Properties', // select query
+      visible: tables.includes(params.selectionText),
+      click() {
+        if (sender) {
+          sender.send('openTable', params.selectionText);
+        }
+      }
     }];
   }
 });

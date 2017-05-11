@@ -41,6 +41,15 @@ export default class MainView extends React.Component {
         this.setState({ selectedTable: tableName });
       });
     }
+
+    if (!ipcRenderer._events['openTable']) {
+      ipcRenderer.on('openTable', (event, tableName) => {
+        this.setState({
+          selectedTable: tableName,
+          modalOpen: true
+        });
+      });
+    }
     ipcRenderer.send('getTables');
     ipcRenderer.send('selectTable');
   }
@@ -51,6 +60,7 @@ export default class MainView extends React.Component {
     delete ipcRenderer._events['dropTable'];
     delete ipcRenderer._events['selectTable'];
     delete ipcRenderer._events['insertInto'];
+    delete ipcRenderer._events['openTable'];
   }
 
   tableCreated(name) {
@@ -59,12 +69,11 @@ export default class MainView extends React.Component {
     });
   }
 
-  openTable(event) {
+  selectTable(event) {
     let tableName = event.nativeEvent.target.innerText;
     tableName = tableName.substring(0, tableName.length - 1);
     this.setState({
-      selectedTable: tableName,
-      modalOpen: true
+      selectedTable: tableName
     });
   }
 
@@ -163,7 +172,7 @@ export default class MainView extends React.Component {
               <H4 text='Tables' styles={headerStyle}/>
               <Panel styles={innerPanelStyle}>
                 <List className= 'tables-list' style={listStyle}>
-                  {this.state.tables.map((table, index) => <ListItem key={index} id={index} selectedTable={this.state.selectedTable} text={table} styles={listItemStyle} onClick={this.openTable.bind(this)} deleteTable={this.deleteTable.bind(this)}/>)}
+                  {this.state.tables.map((table, index) => <ListItem key={index} id={index} selectedTable={this.state.selectedTable} text={table} styles={listItemStyle} onClick={this.selectTable.bind(this)} deleteTable={this.deleteTable.bind(this)}/>)}
                 </List>
               </Panel>
               <ModalWindow title="New table" tables={this.state.tables} open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.selectedTable} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
