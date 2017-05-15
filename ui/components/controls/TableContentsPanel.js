@@ -3,6 +3,7 @@ import ReactDataGrid from 'react-data-grid';
 import update from 'react-addons-update';
 import { Toolbar } from 'react-data-grid-addons';
 import { ipcRenderer } from 'electron';
+import TableRowPopup from './TableRowPopup';
 
 export default class TableContentsPanel extends React.Component {
   constructor(props) {
@@ -11,7 +12,8 @@ export default class TableContentsPanel extends React.Component {
     if (this.props.main) {
       this.state = {
         columns: [],
-        rows: []
+        rows: [],
+        modalOpen: false
       };
     } else {
       const columns = [];
@@ -37,7 +39,6 @@ export default class TableContentsPanel extends React.Component {
         rows: this.props.rows
       };
     }
-
   }
 
   componentWillReceiveProps(nextProps) {
@@ -53,6 +54,9 @@ export default class TableContentsPanel extends React.Component {
       }
 
       if (this.props.tableName !== nextProps.tableName) {
+        this.setState({
+          tableName: nextProps.tableName
+        });
         if (nextProps.tableName) {
           ipcRenderer.send('getTableContents', { tableName: nextProps.tableName });
         }
@@ -93,9 +97,25 @@ export default class TableContentsPanel extends React.Component {
   }
 
   handleRowClick(rowIndex, row) {
-    if (rowIndex >= 0) {
-      ipcRenderer.send('updateRow', { index: rowIndex, row });
+    const keys = Object.keys(row);
+    if (keys.length === 1 && keys[0] === 'value') {
+      delete row.value;
+      for(const val of this.state.columns) {
+        row[val.name] = '';
+      }
+      console.log(this.state.columns);
+      this.setState({
+        modalOpen: true,
+        row,
+        blank: true
+      });
+      return;
     }
+    this.setState({
+      modalOpen: true,
+      row,
+      blank: false
+    });
   }
 
   render() {
@@ -111,16 +131,19 @@ export default class TableContentsPanel extends React.Component {
       );
     } else {
       return (
-        <ReactDataGrid
-          enableCellSelect={true}
-          columns={this.state.columns}
-          rowGetter={this.rowGetter.bind(this)}
-          onRowClick={this.handleRowClick.bind(this)}
-          rowsCount={this.state.rows ? this.state.rows.length : 0}
-          onGridRowsUpdated={this.gridUpdate}
-          toolbar={<Toolbar onAddRow={this.handleAddRow.bind(this)}/>}
-          minHeight={this.props.minHeight || 490}
-        />
+        <div>
+          <ReactDataGrid
+            enableCellSelect={true}
+            columns={this.state.columns}
+            rowGetter={this.rowGetter.bind(this)}
+            onRowClick={this.handleRowClick.bind(this)}
+            rowsCount={this.state.rows ? this.state.rows.length : 0}
+            onGridRowsUpdated={this.gridUpdate}
+            toolbar={<Toolbar onAddRow={this.handleAddRow.bind(this)}/>}
+            minHeight={this.props.minHeight || 490}
+          />
+          <TableRowPopup isOpen={this.state.modalOpen} row={this.state.row} tableName={this.state.tableName} blank={this.state.blank} cols={this.state.columns}/>
+        </div>
       );
     }
   }
