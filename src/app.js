@@ -47,6 +47,8 @@ async function execute(query) {
   let result;
   if (queryType === 'select') {
     result = await db.instance.all(query);
+  } else if (queryType === 'insert' || queryType === 'update') {
+    result = await db.instance.all(query);
   }
   return result;
 }
@@ -135,14 +137,14 @@ function createWindow() {
   });
 
   ipc.on('queryExecution', async (event, sqlQuery) => {
+    console.log(sqlQuery);
     let result;
     try {
       result = await execute(sqlQuery);
     } catch(e) {
       result = e;
     } finally {
-      console.log(result);
-      event.sender.send('queryExecution', result);
+      event.sender.send('queryExecution:res', result);
     }
   });
 

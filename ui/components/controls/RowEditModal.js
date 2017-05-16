@@ -16,7 +16,6 @@ class RowEditModal extends React.Component {
   componentDidMount() {
     if (!ipcRenderer._events['updateRow']) {
       ipcRenderer.on('updateRow', (event, data) => {
-        console.log(data);
         this.toggle();
         this.setState({ rowIndex: data.index, row: data.row });
       });

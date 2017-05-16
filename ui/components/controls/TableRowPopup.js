@@ -19,10 +19,12 @@ class TableRowPopup extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      modal: nextProps.isOpen,
-      row: nextProps.row
-    });
+    if (this.props.isOpen !== nextProps.isOpen || this.props.row !== nextProps.row) {
+      this.setState({
+        modal: nextProps.isOpen,
+        row: nextProps.row
+      });
+    }
   }
 
   toggle() {
@@ -31,40 +33,41 @@ class TableRowPopup extends React.Component {
     });
   }
 
-  executeQuery() {
-    ipcRenderer.send('queryExecution', this.refs.textarea.state.text);
-  }
-
   executeUpdate() {
-    console.log(this.props.blank);
+    let query = '';
     if (!this.props.blank) {
       let params = '';
       for (const key of this.props.cols) {
-        params += `${key.name}=${this.state.row[key.name]},`;
+        if (key.name !== 'id') {
+          const param = this.state.row[key.name];
+          params += isNaN(param) ? `${key.name}='${param}',` : `${key.name}=${param},` ;
+        }
       }
       params = params.substring(0, params.length - 1);
-      const SQLQuery = `UPDATE ${this.props.tableName} SET(${params}) WHERE id=${this.state.row.id}`;
-      console.log(SQLQuery);
+      query = `UPDATE ${this.props.tableName} SET ${params} WHERE id=${this.state.row.id}`;
     } else {
       let params = '';
       let cols = '';
       for(const key of this.props.cols) {
-        params += `${this.state.row[key.name]},`;
+        const param = this.state.row[key.name];
+        params += isNaN(param) ? `'${param}',` : `${param},`;
         cols += `${key.name},`;
       }
       cols = cols.substring(0, cols.length - 1);
       params = params.substring(0, params.length - 1);
-      const query = `INSERT INTO ${this.props.tableName}(${cols}) VALUES(${params});`;
-      console.log(query);
+      query = `INSERT INTO ${this.props.tableName}(${cols}) VALUES(${params});`;
     }
-    // this.toggle();
+    ipcRenderer.send('queryExecution', query);
+    this.toggle();
+    this.props.updateRow(this.props.rowIndex, this.state.row);
   }
 
   executeDelete() {
     const idInput = ReactDOM.findDOMNode(this.refs.id);
     const sqlQuery = `DELETE FROM ${this.props.tableName} WHERE id=${idInput.value}`;
-    ipcRenderer.send('executeQuery', );
+    ipcRenderer.send('queryExecution', sqlQuery);
     this.toggle();
+    this.props.deleteRow(this.props.rowIndex);
   }
 
   valueChanged(e) {
@@ -76,7 +79,7 @@ class TableRowPopup extends React.Component {
 
   render() {
     const dataArray = [];
-    for(const key of this.props.cols) {
+    for(const key of this.props.cols || []) {
       dataArray.push({ [key.name]: this.state.row[key.name] });
     }
     return (

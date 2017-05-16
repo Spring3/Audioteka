@@ -22,8 +22,8 @@ class QueryModal extends React.Component {
       });
     }
 
-    if (!ipcRenderer._events['queryExecution']) {
-      ipcRenderer.on('queryExecution', (event, results) => {
+    if (!ipcRenderer._events['queryExecution:res']) {
+      ipcRenderer.on('queryExecution:res', (event, results) => {
         let type;
         if (Array.isArray(results)) {
           type = 'array';
@@ -43,7 +43,7 @@ class QueryModal extends React.Component {
   }
 
   componentWillUnmount() {
-    delete ipcRenderer._events['queryExecution'];
+    delete ipcRenderer._events['queryExecution:res'];
     delete ipcRenderer._events['customQuery'];
   }
 

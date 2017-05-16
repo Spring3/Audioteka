@@ -93,19 +93,25 @@ export default class TableContentsPanel extends React.Component {
 
     let rows = this.state.rows.slice();
     rows = update(rows, {$push: [newRow]});
-    this.setState({ rows });
+    this.setState({ modalOpen: false, rows });
   }
 
   handleRowClick(rowIndex, row) {
     const keys = Object.keys(row);
-    if (keys.length === 1 && keys[0] === 'value') {
+    let isBlank = true;
+    for(const key of keys) {
+      if (row[key] !== '') {
+        isBlank = false;
+      }
+    }
+    if ((keys.length === 1 && keys[0] === 'value') || isBlank) {
       delete row.value;
       for(const val of this.state.columns) {
         row[val.name] = '';
       }
-      console.log(this.state.columns);
       this.setState({
         modalOpen: true,
+        rowIndex,
         row,
         blank: true
       });
@@ -113,9 +119,22 @@ export default class TableContentsPanel extends React.Component {
     }
     this.setState({
       modalOpen: true,
+      rowIndex,
       row,
       blank: false
     });
+  }
+
+  updateRow(index, newRow) {
+    const rows = this.state.rows;
+    rows[index] = newRow;
+    this.setState({ rows });
+  }
+
+  deleteRow(index) {
+    let rows = this.state.rows;
+    rows = rows.splice(index, 1);
+    this.setState({ rows });
   }
 
   render() {
@@ -142,7 +161,7 @@ export default class TableContentsPanel extends React.Component {
             toolbar={<Toolbar onAddRow={this.handleAddRow.bind(this)}/>}
             minHeight={this.props.minHeight || 490}
           />
-          <TableRowPopup isOpen={this.state.modalOpen} row={this.state.row} tableName={this.state.tableName} blank={this.state.blank} cols={this.state.columns}/>
+          <TableRowPopup isOpen={this.state.modalOpen} updateRow={this.updateRow.bind(this)} deleteRow={this.deleteRow.bind(this)} row={this.state.row} rowIndex={this.state.rowIndex} tableName={this.state.tableName} blank={this.state.blank} cols={this.state.columns}/>
         </div>
       );
     }
