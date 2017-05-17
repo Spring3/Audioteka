@@ -1,0 +1,7 @@
+Report from 2017-05-17T00:07:30.419Z
+SELECT name FROM sqlite_master WHERE type='table'
+PRAGMA table_info(TestTable);
+SELECT * from TestTable;
+SELECT name FROM sqlite_master WHERE type='table'
+PRAGMA table_info(TestTable);
+SELECT * from TestTable;

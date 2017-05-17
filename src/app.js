@@ -2,9 +2,18 @@ const path = require('path');
 const electron = require('electron');
 const url = require('url');
 const ipc = electron.ipcMain;
+const { Menu, MenuItem, dialog } = electron;
 const db = require('./core/db');
+const fs = require('fs');
+
+const reportFilePath = path.join(__dirname, '../report.txt');
+fs.writeFile(reportFilePath, `Report from ${new Date().toISOString()}\n`, (error) => {});
+
 let tables = [];
 let sender;
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+let mainWindow;
 
 require('electron-context-menu')({
   prepend: (params, BrowserWindow) => {
@@ -36,21 +45,14 @@ require('electron-context-menu')({
   }
 });
 
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-
-let mainWindow;
+function addReport(string) {
+  fs.appendFile(reportFilePath, `${string}\n`, (error) => {});
+}
 
 // Execute sql query
 async function execute(query) {
-  const queryType = query.split(' ')[0].toLowerCase();
-  let result;
-  if (queryType === 'select') {
-    result = await db.instance.all(query);
-  } else if (queryType === 'insert' || queryType === 'update') {
-    result = await db.instance.all(query);
-  }
-  return result;
+  addReport(query);
+  return await db.instance.all(query);
 }
 
 function createWindow() {
@@ -60,6 +62,21 @@ function createWindow() {
     protocol: 'file',
     slashes: true
   }));
+  const template = [
+    {
+      label: 'Report',
+      submenu: [
+        {
+          label: 'Show Report',
+          click() {
+              const report = fs.readFileSync(reportFilePath, 'utf8');
+              dialog.showMessageBox(mainWindow, { title: 'Report', message: report });
+          }
+        }
+      ]
+    }
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 
   // mainWindow.webContents.openDevTools();
 
@@ -70,7 +87,9 @@ function createWindow() {
   // test database connection
   ipc.on('dbConnect', async (event, dbName) => {
     const result = await db.connect(path.resolve(__dirname, '../data'), dbName);
-    tables = await db.instance.all(`SELECT name FROM sqlite_master WHERE type='table'`);
+    const query = `SELECT name FROM sqlite_master WHERE type='table'`;
+    addReport(query);
+    tables = await db.instance.all(query);
     tables = tables.map((t) => t.name);
     event.sender.send('dbConnect', result);
   });
@@ -106,10 +125,13 @@ function createWindow() {
         }
       }
       const tableCols = array.concat(fKeys).join(',');
-      const result = await db.instance.run(`CREATE TABLE IF NOT EXISTS ${data.tableName} (${tableCols});`);
+      const query = `CREATE TABLE IF NOT EXISTS ${data.tableName} (${tableCols});`;
+      addReport(query);
+      const result = await db.instance.run(query);
       tables.push(data.tableName);
       event.sender.send('createTable', { success: true });
     } catch (e) {
+      addReport(e.stack);
       event.sender.send('createTable', { success: false, error: e });
     }
   });
@@ -121,15 +143,22 @@ function createWindow() {
 
   // get columns of a table and info about it
   ipc.on('getTableColumns', async (event, data) => {
-    const result = await db.instance.all(`PRAGMA table_info(${data.tableName});`);
-    const fKeys = await db.instance.all(`PRAGMA foreign_key_list(${data.tableName});`);
+    let query = `PRAGMA table_info(${data.tableName});`;
+    addReport(query);
+    const result = await db.instance.all(query);
+    query = `PRAGMA foreign_key_list(${data.tableName});`;
+    addReport(query);
+    const fKeys = await db.instance.all(query);
     event.sender.send('getTableColumns', { columns: result, tableName: data.tableName, fKeys: fKeys });
   });
 
   // select all from table
   ipc.on('getTableContents', async (event, req) => {
-    const columns = await db.instance.all(`PRAGMA table_info(${req.tableName});`);
-    const data = await execute(`SELECT * from ${req.tableName};`);
+    let query = `PRAGMA table_info(${req.tableName});`;
+    addReport(query);
+    const columns = await db.instance.all(query);
+    query = `SELECT * from ${req.tableName};`;
+    const data = await execute(query);
     event.sender.send('getTableContents', {
       columns,
       data
@@ -137,12 +166,12 @@ function createWindow() {
   });
 
   ipc.on('queryExecution', async (event, sqlQuery) => {
-    console.log(sqlQuery);
     let result;
     try {
       result = await execute(sqlQuery);
     } catch(e) {
       result = e;
+      addReport(e.stack);
     } finally {
       event.sender.send('queryExecution:res', result);
     }
@@ -151,9 +180,12 @@ function createWindow() {
   // drop table
   ipc.on('dropTable', async (event, data) => {
     try { 
-      const result = await db.instance.run(`DROP TABLE IF EXISTS ${data.tableName};`);
+      let query = `DROP TABLE IF EXISTS ${data.tableName};`;
+      addReport(query);
+      const result = await db.instance.run(query);
       event.sender.send('dropTable', { success: true, result });
     } catch (e) {
+      addReport(e.stack);
       event.sender.send('dropTable', { success: false, result });
     }
   });
