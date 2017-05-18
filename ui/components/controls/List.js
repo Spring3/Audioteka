@@ -30,8 +30,12 @@ class ListItem extends React.Component {
   }
 
   render() {
+    const className = this.props.text === this.props.selectedTable ? 'list-group-item selected' : 'list-group-item';
     return (
-      <li className='list-group-item' style={this.props.styles} onClick={this.handleClick.bind(this)}>{this.props.text}<span className='btn-delete' onClick={this.deleteClick.bind(this)}>&times;</span></li>
+      <li className={className} style={this.props.styles} onClick={this.handleClick.bind(this)}>
+      {this.props.text}
+      <span className='btn-delete' onClick={this.deleteClick.bind(this)}>&times;</span>
+      </li>
     );
   }
 }

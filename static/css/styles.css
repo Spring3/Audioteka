@@ -68,9 +68,42 @@ body {
   display: none;
 }
 
+.btn-view {
+  display: none;
+}
+
 .tables-list li:hover span.btn-delete {
   display: inline-block;
   position: absolute;
   right: 10px;
   font-size: 16px;
+}
+
+.react-grid-Container {
+  left: 0px !important;
+  width: 100% !important;
+}
+
+.tables-list li:hover span.btn-view {
+  display: inline-block;
+  position: absolute;
+  left: 10px;
+  font-size: 16px;
+}
+
+li.list-group-item.selected {
+  border-bottom: 3px solid darkseagreen !important;
+}
+
+.react-grid-Container {
+  left: -15px;
+  position: relative;
+}
+
+.no-padding {
+  padding: 0px !important;
+}
+
+.modal-large {
+  max-width: 80% !important;
 }

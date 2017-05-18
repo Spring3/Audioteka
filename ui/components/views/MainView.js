@@ -10,39 +10,57 @@ import { List, ListItem } from './../controls/List';
 import Copyrights from './../controls/Copyrights';
 import ModalWindow from './../controls/CreateTableModal';
 import WarningModal from './../controls/WarningModal';
+import TableContentsPanel from './../controls/TableContentsPanel';
+import QueryModal from './../controls/QueryModal';
 
 export default class MainView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       tables: [],
-      tableName: undefined,
-      contents: undefined,
-      constraints: undefined,
+      selectedTable: undefined,
       modalOpen: false,
       warningOpen: false
     };
   }
 
   componentDidMount() {
+    if (!ipcRenderer._events['selectTable']) {
+      ipcRenderer.on('selectTable', (event, tableName) => {
+        this.setState({ selectedTable: tableName });
+      });
+    }
     if (!ipcRenderer._events['getTables']) {
       ipcRenderer.on('getTables', (event, data) => {
-        const tablesArray = [];
-        for(const table of data.tables){
-          if (table.name !== 'sqlite_sequence') {
-            tablesArray.push(table.name);
-          }
-        }
+        const tablesArray = data.tables.filter((t) => t !== 'sqlite_sequence');
         this.setState({ tables: tablesArray });
       });
     }
+    if (!ipcRenderer._events['insertInto']) {
+      ipcRenderer.on('insertInto', (event, tableName) => {
+        this.setState({ selectedTable: tableName });
+      });
+    }
+
+    if (!ipcRenderer._events['openTable']) {
+      ipcRenderer.on('openTable', (event, tableName) => {
+        this.setState({
+          selectedTable: tableName,
+          modalOpen: true
+        });
+      });
+    }
     ipcRenderer.send('getTables');
+    ipcRenderer.send('selectTable');
   }
 
   componentWillUnmount() {
     delete ipcRenderer._events['getTables'];
     delete ipcRenderer._events['getTableColumns'];
     delete ipcRenderer._events['dropTable'];
+    delete ipcRenderer._events['selectTable'];
+    delete ipcRenderer._events['insertInto'];
+    delete ipcRenderer._events['openTable'];
   }
 
   tableCreated(name) {
@@ -51,47 +69,12 @@ export default class MainView extends React.Component {
     });
   }
 
-  openTable(event) {
+  selectTable(event) {
     let tableName = event.nativeEvent.target.innerText;
     tableName = tableName.substring(0, tableName.length - 1);
-    if (!ipcRenderer._events['getTableColumns']) {
-      ipcRenderer.on('getTableColumns', (event, data) => {
-        const constraints = {};
-        const contents = [];
-        data.columns.forEach((element, index) => {
-          contents.push(index);
-          const constraint = {
-            name: element.name,
-            type: element.type
-          }
-
-          data.fKeys.forEach((key) => {
-            if (key.from === element.name) {
-              constraint.type = 'REFERENCES';
-              constraint.option = key.table;
-            }
-          });
-
-          if (!constraint.type === 'REFERENCES') {
-            if (element.pk === 1) {
-              constraint.option = 'PRIMARY KEY';
-            } else if (element.notnull === 1) {
-              constraint.option = 'NOT NULL';
-            } else if (element.cid === 1) {
-              constraint.option = 'UNIQUE';
-            }
-          }
-          constraints[index] = constraint;
-        });
-        this.setState({
-          tableName: data.tableName,
-          contents: contents,
-          constraints: constraints,
-          modalOpen: true
-        });
-      });
-    }
-    ipcRenderer.send('getTableColumns', { tableName });
+    this.setState({
+      selectedTable: tableName
+    });
   }
 
   deleteTable (tableName, index = -1) {
@@ -134,9 +117,6 @@ export default class MainView extends React.Component {
 
   reset () {
     this.setState({
-      tableName: undefined,
-      contents: undefined,
-      constraints: undefined,
       modalOpen: false
     });
   }
@@ -154,10 +134,12 @@ export default class MainView extends React.Component {
     const innerPanelStyle = {
       background: 'white',
       padding: '0px !important',
-      height: '200px',
       overflowY: 'scroll',
       overflowX: 'hidden',
-      width: '100%'
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      flexDirection: 'column'
     }
 
     const headerStyle = {
@@ -169,7 +151,8 @@ export default class MainView extends React.Component {
     };
 
     const listStyle = {
-      textAlign: 'center'
+      textAlign: 'center',
+      width: '100%'
     };
 
     const listItemStyle = {
@@ -192,15 +175,17 @@ export default class MainView extends React.Component {
               <H4 text='Tables' styles={headerStyle}/>
               <Panel styles={innerPanelStyle}>
                 <List className= 'tables-list' style={listStyle}>
-                  {this.state.tables.map((table, index) => <ListItem key={index} id={index} text={table} styles={listItemStyle} onClick={this.openTable.bind(this)} deleteTable={this.deleteTable.bind(this)}/>)}
+                  {this.state.tables.map((table, index) => <ListItem key={index} id={index} selectedTable={this.state.selectedTable} text={table} styles={listItemStyle} onClick={this.selectTable.bind(this)} deleteTable={this.deleteTable.bind(this)}/>)}
                 </List>
               </Panel>
-              <ModalWindow title="New table" tables={this.state.tables} open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.tableName} contents={this.state.contents} constraints={this.state.constraints} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
+              <ModalWindow title="New table" tables={this.state.tables} open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.selectedTable} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
               <WarningModal open={this.state.warningOpen} message='Are you sure you want to drop the table?' action={this.confirmDrop.bind(this)}/>
             </Panel>
-            <Panel cols='offset-sm-1 col-sm-8' styles={panelStyle}>
+            <Panel cols='offset-sm-1 col-sm-8 no-padding' styles={panelStyle}>
+              <TableContentsPanel main={true} tableName={this.state.selectedTable }/>
             </Panel>
           </Row>
+          <QueryModal/>
         </Container>
         <Copyrights/>
       </div>

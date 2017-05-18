@@ -61,7 +61,7 @@ class ModalRow extends React.Component {
     return (
       <div className="form-group modal-form" style={formGroupStyle}>
         <div>
-          <Label text="Constraint" className="form-control-label" styles={labelStyle}/>
+          <Label text="Column name" className="form-control-label" styles={labelStyle}/>
           <Input className="form-control" value={this.state.name} disabled={this.props.disabled} onChange={this.onConstraintNameChange.bind(this)}/>
         </div>
         <div>
@@ -99,8 +99,8 @@ export default class ModalWindow extends React.Component {
     this.state = {
       open: this.props.open || false,
       tableName: this.props.tableName || false,
-      contents: this.props.contents || [],
-      constraints: this.props.constraints || {},
+      contents: [],
+      constraints: {},
       exists: this.props.exists || false
     };
 
@@ -108,20 +108,58 @@ export default class ModalWindow extends React.Component {
     this.addRow = this.addRow.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.open && !this.state.open) {
-      this.setState({
-        open: nextProps.open,
-        tableName: nextProps.tableName,
-        contents: nextProps.contents,
-        constraints: nextProps.constraints,
-        exists: true
+  componentDidMount() {
+    if (!ipcRenderer._events['getTableColumns']) {
+      ipcRenderer.on('getTableColumns', (event, data) => {
+        const constraints = {};
+        const contents = [];
+        data.columns.forEach((element, index) => {
+          contents.push(index);
+          const constraint = {
+            name: element.name,
+            type: element.type
+          }
+
+          data.fKeys.forEach((key) => {
+            if (key.from === element.name) {
+              constraint.type = 'REFERENCES';
+              constraint.option = key.table;
+            }
+          });
+
+          if (!constraint.type === 'REFERENCES') {
+            if (element.pk === 1) {
+              constraint.option = 'PRIMARY KEY';
+            } else if (element.notnull === 1) {
+              constraint.option = 'NOT NULL';
+            } else if (element.cid === 1) {
+              constraint.option = 'UNIQUE';
+            }
+          }
+          constraints[index] = constraint;
+        });
+        this.setState({
+          tableName: data.tableName,
+          contents,
+          constraints,
+          open: true,
+          exists: true
+        });
       });
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.tableName) {
+      if (nextProps.open) {
+        ipcRenderer.send('getTableColumns', { tableName: nextProps.tableName });
+      }
     }
   }
 
   componentWillUnmount() {
     delete ipcRenderer._events['createTable'];
+    delete ipcRenderer._events['getTableColumns'];
   }
 
   trigger () {
@@ -216,10 +254,15 @@ export default class ModalWindow extends React.Component {
       justifyContent: 'flex-start !important'
     };
 
+    const btnStyle = {
+      position: 'absolute',
+      bottom: '0px'
+    };
+
     return (
-      <div>
-        <Button className='btn btn-primary btn-block btn-ghost' onClick={this.trigger}>Add New</Button>
-        <Modal isOpen={this.state.open} toggle={this.trigger} className={this.props.className}>
+      <Button className='btn btn-primary btn-block btn-ghost' onClick={this.trigger} style={btnStyle}>
+      Add New
+      <Modal isOpen={this.state.open} toggle={this.trigger} className={this.props.className}>
           <ModalHeader toggle={this.trigger}>{this.state.exists ? this.state.tableName : this.props.title}</ModalHeader>
           <ModalBody>
             <div className="form-group" style={formGroupStyle}>
@@ -244,7 +287,7 @@ export default class ModalWindow extends React.Component {
             <Button onClick={this.create.bind(this)} outline color="success" disabled={this.state.exists}>{this.props.confirm}</Button>
           </ModalFooter>
         </Modal>
-      </div>
+      </Button>
     );
   }
 }
