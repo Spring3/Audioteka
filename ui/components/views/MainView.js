@@ -134,10 +134,12 @@ export default class MainView extends React.Component {
     const innerPanelStyle = {
       background: 'white',
       padding: '0px !important',
-      height: '200px',
       overflowY: 'scroll',
       overflowX: 'hidden',
-      width: '100%'
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      flexDirection: 'column'
     }
 
     const headerStyle = {
@@ -149,7 +151,8 @@ export default class MainView extends React.Component {
     };
 
     const listStyle = {
-      textAlign: 'center'
+      textAlign: 'center',
+      width: '100%'
     };
 
     const listItemStyle = {
@@ -178,7 +181,7 @@ export default class MainView extends React.Component {
               <ModalWindow title="New table" tables={this.state.tables} open={this.state.modalOpen} action={this.deleteTable.bind(this)} tableName={this.state.selectedTable} reset={this.reset.bind(this)} id="createTable" onCreate={this.tableCreated.bind(this)} confirm="Create"></ModalWindow>
               <WarningModal open={this.state.warningOpen} message='Are you sure you want to drop the table?' action={this.confirmDrop.bind(this)}/>
             </Panel>
-            <Panel cols='offset-sm-1 col-sm-8' styles={panelStyle}>
+            <Panel cols='offset-sm-1 col-sm-8 no-padding' styles={panelStyle}>
               <TableContentsPanel main={true} tableName={this.state.selectedTable }/>
             </Panel>
           </Row>

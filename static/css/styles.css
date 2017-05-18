@@ -79,6 +79,11 @@ body {
   font-size: 16px;
 }
 
+.react-grid-Container {
+  left: 0px !important;
+  width: 100% !important;
+}
+
 .tables-list li:hover span.btn-view {
   display: inline-block;
   position: absolute;
@@ -93,6 +98,10 @@ li.list-group-item.selected {
 .react-grid-Container {
   left: -15px;
   position: relative;
+}
+
+.no-padding {
+  padding: 0px !important;
 }
 
 .modal-large {
