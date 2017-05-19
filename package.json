@@ -8,12 +8,11 @@
     "dev": "node_modules/.bin/webpack && asar pack ./src app.asar && ./node_modules/.bin/electron .",
     "start": "./node_modules/.bin/electron .",
     "build": "node_modules/.bin/electron-rebuild",
-    "pack-mac-x64": "node_modules/.bin/electron-packager ./ Audioteka --platform=darwin --arch=x64 --out ./builds --ignore='/src|ui|webpack.config.js|build.(sh|bat)|data' --overwrite",
-    "pack-linux-ia32": "node_modules/.bin/electron-packager ./ Audioteka --platform=linux --arch=ia32 --out ./builds --ignore='/src|ui|webpack.config.js|build.(sh|bat)|data' --overwrite",
-    "pack-linux-x64": "node_modules/.bin/electron-packager ./ Audioteka --platform=linux --arch=x64 --out ./builds --ignore='/src|ui|webpack.config.js|build.(sh|bat)|data' --overwrite",
-    "pack-win-ia32": "node_modules/.bin/electron-packager ./ Audioteka --platform=win32 --arch=ia32 --out ./builds --ignore='/src|ui|webpack.config.js|build.(sh|bat)|data' --overwrite",
-    "pack-win-x64": "node_modules/.bin/electron-packager ./ Audioteka --platform=win32 --arch=x64 --out ./builds --ignore='/src|ui|webpack.config.js|build.(sh|bat)|data' --overwrite",
-    "dmg": "./build.sh mac"
+    "dmg": "node_modules/.bin/electron-packager ./ Audioteka --platform=darwin --arch=x64 --out ./builds --ignore='/src|ui|webpack.config.js|build.(sh|bat)|data' --overwrite",
+    "pack-linux-ia32": "node_modules/.bin/electron-packager ./ Audioteka --platform=linux --arch=ia32 --out ./builds --ignore='/src|ui|webpack.config.js|shots|data' --overwrite",
+    "pack-linux-x64": "node_modules/.bin/electron-packager ./ Audioteka --platform=linux --arch=x64 --out ./builds --ignore='/src|ui|webpack.config.js|shots|data' --overwrite",
+    "pack-win-ia32": "node_modules/.bin/electron-packager ./ Audioteka --platform=win32 --arch=ia32 --out ./builds --ignore='/src|ui|webpack.config.js|shots|data' --overwrite",
+    "pack-win-x64": "node_modules/.bin/electron-packager ./ Audioteka --platform=win32 --arch=x64 --out ./builds --ignore='/src|ui|webpack.config.js|shots|data' --overwrite"
   },
   "repository": {
     "type": "git",
